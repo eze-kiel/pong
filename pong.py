@@ -52,6 +52,8 @@ GPIO.setup(KEY2_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(KEY3_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ## GAME SETUP
+DIFFICULTY = 1 # this is the number of pixel the ball will move each tick
+
 # player 1
 P1_X = 15
 
@@ -63,6 +65,8 @@ P1_BOTTOM_Y = 45
 
 # ball
 GO_TO_LEFT = True
+BALL_X = 61
+BALL_Y = 30
 
 # create the initial line
 def mainPanelStartup(draw):
@@ -100,18 +104,33 @@ def updatePlayer(player, movement, draw):
         # the new line is drew
         draw.line([(P1_X,P1_TOP_Y),(P1_X,P1_BOTTOM_Y)])
 
-# def ballMovement():
-#     # verifier direction
-#     # wipe le centre du pannel
-#     # décaler de 1px le point
-#     # vérifier si le x est à 30
-#     # si c'est le cas, regarder si le Y est entre P1_BOTTOM_Y et P1_TOP_Y
-#     # si c'est le cas, changer direction
+def ballMovement(draw):
+    # décaler de 1px le point
+    # vérifier si le x est à 15
+    # si c'est le cas, regarder si le Y est entre P1_BOTTOM_Y et P1_TOP_Y
+    # si c'est le cas, changer direction
+    global GO_TO_LEFT, BALL_X, BALL_Y
+    if GO_TO_LEFT:
+        # the screen is cleared
+        draw.rectangle([(15, 0), (110, 127)], fill="#ffffff")
 
-#     if GO_TO_LEFT:
+        # draw the ball
+        BALL_X -= DIFFICULTY
+        draw.point((BALL_X, BALL_Y))
 
-#         #if x = 30 alors voir si on est entre top et bottom de p1
-#     else:
+        if BALL_X <= 15:
+            GO_TO_LEFT = False
+        #if x = 15 alors voir si on est entre top et bottom de p1
+    else:
+        # the screen is cleared
+        draw.rectangle([(15, 0), (110, 127)], fill="#ffffff")
+
+        # draw the ball
+        BALL_X += DIFFICULTY
+        draw.point((BALL_X, BALL_Y))
+
+        if BALL_X >= 110:
+            GO_TO_LEFT = True
 
 
 
@@ -130,11 +149,14 @@ disp.ShowImage(disp.getbuffer(welcomePanel))
 time.sleep(3)
 
 while 1:
+
     if not GPIO.input(KEY_UP_PIN):
         updatePlayer("player1", "up", drawMainPanel)
     
     if not GPIO.input(KEY_DOWN_PIN):
         updatePlayer("player1", "down", drawMainPanel)
+
+    ballMovement(drawMainPanel)
 
     # refresh main image
     disp.ShowImage(disp.getbuffer(mainPanel))
