@@ -112,7 +112,7 @@ def ballMovement(draw):
     global GO_TO_LEFT, BALL_X, BALL_Y
     if GO_TO_LEFT:
         # the screen is cleared
-        draw.rectangle([(15, 0), (110, 127)], fill="#ffffff")
+        draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
 
         # draw the ball
         BALL_X -= DIFFICULTY
@@ -123,7 +123,7 @@ def ballMovement(draw):
         #if x = 15 alors voir si on est entre top et bottom de p1
     else:
         # the screen is cleared
-        draw.rectangle([(15, 0), (110, 127)], fill="#ffffff")
+        draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
 
         # draw the ball
         BALL_X += DIFFICULTY
