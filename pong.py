@@ -52,8 +52,9 @@ GPIO.setup(KEY2_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(KEY3_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ## GAME SETUP
-DIFFICULTY = 1 # this is the number of pixel the ball will move each tick
+DIFFICULTY = 5 # this is the number of pixel the ball will move each tick
 END_OF_GAME = False # set to True when a player loses a point
+WINNER = "none"
 
 # player 1
 P1_X = 15
@@ -81,6 +82,21 @@ def mainPanelStartup(draw):
 
 def welcomePanelStartup(draw):
     draw.text((30,30), "hello !")
+
+def endPanelStartup(draw, winner):
+    draw.rectangle([(0, 0), (127, 63)], fill="#ffffff")
+
+    if winner == "player1":
+        draw.text((2,30), "player 1 won ! GG WP")
+    else:
+        draw.text((2,30), "player 2 won ! GG WP")
+
+def checkPoint(currentY, YTop, YBottom):
+    if YTop <= currentY <= YBottom:
+        return False
+    else:
+        return True
+
 
 # updatePlayer adjust the position of the player line depending of the movement
 def updatePlayer(player, movement, draw):
@@ -136,11 +152,7 @@ def updatePlayer(player, movement, draw):
         draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
 def ballMovement(draw):
-    # décaler de 1px le point
-    # vérifier si le x est à 15
-    # si c'est le cas, regarder si le Y est entre P1_BOTTOM_Y et P1_TOP_Y
-    # si c'est le cas, changer direction
-    global GO_TO_LEFT, BALL_X, BALL_Y, END_OF_GAME
+    global GO_TO_LEFT, BALL_X, BALL_Y, END_OF_GAME, WINNER
     if GO_TO_LEFT:
         # the screen is cleared
         draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
@@ -151,6 +163,9 @@ def ballMovement(draw):
 
         if BALL_X <= 16:
             GO_TO_LEFT = False
+            if checkPoint(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y):
+                END_OF_GAME = True
+                WINNER = "player2"
             
     else:
         # the screen is cleared
@@ -162,16 +177,21 @@ def ballMovement(draw):
 
         if BALL_X >= 110:
             GO_TO_LEFT = True
+            if checkPoint(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y):
+                END_OF_GAME = True
+                WINNER = "player1"
 
 
 
 # create images for drawing.
 welcomePanel = Image.new('1', (disp.width, disp.height), "WHITE")
 mainPanel = Image.new('1', (disp.width, disp.height), "WHITE")
+endPanel = Image.new('1', (disp.width, disp.height), "WHITE")
 
 # create drawers
 drawWelcomePanel = ImageDraw.Draw(welcomePanel)
 drawMainPanel = ImageDraw.Draw(mainPanel)
+drawEndPanel = ImageDraw.Draw(endPanel)
 
 welcomePanelStartup(drawWelcomePanel)
 mainPanelStartup(drawMainPanel)
@@ -196,6 +216,12 @@ while 1:
         updatePlayer("player2", "down", drawMainPanel)
 
     ballMovement(drawMainPanel)
+
+    if END_OF_GAME:
+        endPanelStartup(drawEndPanel, WINNER)
+        disp.ShowImage(disp.getbuffer(endPanel))
+        time.sleep(10)
+        exit(0)
 
     # refresh main image
     disp.ShowImage(disp.getbuffer(mainPanel))
