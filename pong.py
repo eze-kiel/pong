@@ -53,6 +53,7 @@ GPIO.setup(KEY3_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ## GAME SETUP
 DIFFICULTY = 1 # this is the number of pixel the ball will move each tick
+END_OF_GAME = False # set to True when a player loses a point
 
 # player 1
 P1_X = 15
@@ -61,7 +62,10 @@ P1_TOP_Y = 30
 P1_BOTTOM_Y = 45
 
 # player 2
-# ...
+P2_X = 113
+
+P2_TOP_Y = 30
+P2_BOTTOM_Y = 45
 
 # ball
 GO_TO_LEFT = True
@@ -70,7 +74,10 @@ BALL_Y = 30
 
 # create the initial line
 def mainPanelStartup(draw):
+    # player 1
     draw.line([(P1_X,P1_TOP_Y),(P1_X,P1_BOTTOM_Y)])
+    # player 2
+    draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
 def welcomePanelStartup(draw):
     draw.text((30,30), "hello !")
@@ -78,8 +85,7 @@ def welcomePanelStartup(draw):
 # updatePlayer adjust the position of the player line depending of the movement
 def updatePlayer(player, movement, draw):
     if player == "player1":
-        global P1_TOP_Y
-        global P1_BOTTOM_Y
+        global P1_TOP_Y, P1_BOTTOM_Y
 
         if movement == "up":
             # if we are at the top of the screen, we simply ignore the movement instruction
@@ -99,17 +105,42 @@ def updatePlayer(player, movement, draw):
                 P1_BOTTOM_Y += 5
 
         # the screen is cleared
-        draw.rectangle([(0, 0), (127, 127)], fill="#ffffff")
+        draw.rectangle([(0, 0), (15, 127)], fill="#ffffff")
 
         # the new line is drew
         draw.line([(P1_X,P1_TOP_Y),(P1_X,P1_BOTTOM_Y)])
+    else:
+        global P2_TOP_Y, P2_BOTTOM_Y
+
+        if movement == "up":
+            # if we are at the top of the screen, we simply ignore the movement instruction
+            if P2_TOP_Y <= 0:
+                pass
+
+            else:
+                P2_TOP_Y -= 5
+                P2_BOTTOM_Y -= 5
+
+        else:
+            if P2_BOTTOM_Y >= 64:
+                pass
+
+            else:
+                P2_TOP_Y += 5
+                P2_BOTTOM_Y += 5
+
+        # the screen is cleared
+        draw.rectangle([(112, 0), (117, 127)], fill="#ffffff")
+
+        # the new line is drew
+        draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
 def ballMovement(draw):
     # décaler de 1px le point
     # vérifier si le x est à 15
     # si c'est le cas, regarder si le Y est entre P1_BOTTOM_Y et P1_TOP_Y
     # si c'est le cas, changer direction
-    global GO_TO_LEFT, BALL_X, BALL_Y
+    global GO_TO_LEFT, BALL_X, BALL_Y, END_OF_GAME
     if GO_TO_LEFT:
         # the screen is cleared
         draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
@@ -118,9 +149,9 @@ def ballMovement(draw):
         BALL_X -= DIFFICULTY
         draw.point((BALL_X, BALL_Y))
 
-        if BALL_X <= 15:
+        if BALL_X <= 16:
             GO_TO_LEFT = False
-        #if x = 15 alors voir si on est entre top et bottom de p1
+            
     else:
         # the screen is cleared
         draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
@@ -150,11 +181,19 @@ time.sleep(3)
 
 while 1:
 
+    # player 1 controls
     if not GPIO.input(KEY_UP_PIN):
         updatePlayer("player1", "up", drawMainPanel)
     
     if not GPIO.input(KEY_DOWN_PIN):
         updatePlayer("player1", "down", drawMainPanel)
+
+    # player 2 controls
+    if not GPIO.input(KEY1_PIN):
+        updatePlayer("player2", "up", drawMainPanel)
+    
+    if not GPIO.input(KEY3_PIN):
+        updatePlayer("player2", "down", drawMainPanel)
 
     ballMovement(drawMainPanel)
 
