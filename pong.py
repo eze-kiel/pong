@@ -86,7 +86,7 @@ def mainPanelStartup(draw):
     draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
 def welcomePanelStartup(draw):
-    draw.text((30,30), "hello !")
+    draw.text((10,30), "time to PONG ! :D")
 
 def endPanelStartup(draw, winner):
     draw.rectangle([(0, 0), (127, 63)], fill="#ffffff")
