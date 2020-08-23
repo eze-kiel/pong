@@ -55,18 +55,20 @@ GPIO.setup(KEY3_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 DIFFICULTY = 5 # this is the number of pixel the ball will move each tick
 END_OF_GAME = False # set to True when a player loses a point
 WINNER = "none"
+PAD_SPAN = 15 # size of players pads
+MIDDLE_PAD_SPAN = PAD_SPAN/3 # size of the middle of the pad where the ball will go straight
 
 # player 1
 P1_X = 15
 
 P1_TOP_Y = 30
-P1_BOTTOM_Y = 45
+P1_BOTTOM_Y = P1_TOP_Y + PAD_SPAN
 
 # player 2
 P2_X = 113
 
 P2_TOP_Y = 30
-P2_BOTTOM_Y = 45
+P2_BOTTOM_Y = P2_TOP_Y + PAD_SPAN
 
 # ball
 GO_TO_LEFT = True
@@ -102,6 +104,15 @@ def checkPoint(currentY, YTop, YBottom):
     else:
         return True
 
+def computePlayerBounce(currentY, YTop, YBottom):
+    global BALL_X_TRAJ, BALL_Y_TRAJ, MIDDLE_PAD_SPAN, PAD_SPAN
+
+    if currentY >= YTop + MIDDLE_PAD_SPAN and currentY <= YBottom - MIDDLE_PAD_SPAN: # the ball goes straight
+        BALL_Y_TRAJ = 0
+    elif currentY <= YTop + MIDDLE_PAD_SPAN:
+        BALL_Y_TRAJ = -1 # the ball goes up
+    elif currentY >= YBottom - MIDDLE_PAD_SPAN:
+        BALL_Y_TRAJ = 1 # the ball goes down
 
 # updatePlayer adjust the position of the player line depending of the movement
 def updatePlayer(player, movement, draw):
@@ -171,6 +182,11 @@ def ballVector(obstacle):
 
 def ballMovement(draw):
     global BALL_X_TRAJ, BALL_Y_TRAJ, BALL_X, BALL_Y, END_OF_GAME, WINNER
+    if BALL_Y == 0:
+        ballVector("topwall")
+    elif BALL_Y == 64:
+        ballVector("bottomwall")
+
     if BALL_X_TRAJ == -1:
         # the screen is cleared
         draw.rectangle([(16, 0), (111, 127)], fill="#ffffff")
@@ -185,7 +201,8 @@ def ballMovement(draw):
             if checkPoint(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player2"
-        
+
+            computePlayerBounce(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y)
         draw.point((BALL_X, BALL_Y))
             
     else:
@@ -202,7 +219,7 @@ def ballMovement(draw):
             if checkPoint(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player1"
-        
+            computePlayerBounce(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y)
         draw.point((BALL_X, BALL_Y))
 
 
