@@ -156,7 +156,7 @@ def updatePlayer(player, movement, draw):
         # the new line is drew
         draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
-def ballTrajectory(obstacle):
+def ballVector(obstacle):
     global BALL_X_TRAJ, BALL_Y_TRAJ
 
     if obstacle == "player1":
@@ -180,7 +180,7 @@ def ballMovement(draw):
         BALL_Y += BALL_Y_TRAJ
 
         if BALL_X <= 16: # the ball touches player 1 pad
-            ballTrajectory("player1")
+            ballVector("player1")
 
             if checkPoint(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y):
                 END_OF_GAME = True
@@ -197,7 +197,7 @@ def ballMovement(draw):
         BALL_Y += BALL_Y_TRAJ
 
         if BALL_X >= 111:
-            ballTrajectory("player2")
+            ballVector("player2")
 
             if checkPoint(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y):
                 END_OF_GAME = True
