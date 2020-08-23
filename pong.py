@@ -220,7 +220,6 @@ while 1:
     if END_OF_GAME:
         endPanelStartup(drawEndPanel, WINNER)
         disp.ShowImage(disp.getbuffer(endPanel))
-        time.sleep(10)
         exit(0)
 
     # refresh main image
