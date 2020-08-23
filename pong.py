@@ -73,6 +73,11 @@ GO_TO_LEFT = True
 BALL_X = 61
 BALL_Y = 30
 
+# ball trajectory
+# by default, it goes on a horizontal line
+BALL_X_TRAJ = 1
+BALL_Y_TRAJ = 0
+
 # create the initial line
 def mainPanelStartup(draw):
     # player 1
@@ -151,35 +156,54 @@ def updatePlayer(player, movement, draw):
         # the new line is drew
         draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
 
+def ballTrajectory(obstacle):
+    global BALL_X_TRAJ, BALL_Y_TRAJ
+
+    if obstacle == "player1":
+        BALL_X_TRAJ = 1 # the ball goes to the right
+    elif obstacle == "player2":
+        BALL_X_TRAJ = -1 # the ball goes to the left
+    elif obstacle == "topwall":
+        BALL_Y_TRAJ = 1 # the ball goes to the bottom
+    elif obstacle == "bottomwall":
+        BALL_Y_TRAJ = -1 # the ball goes to the top
+
+
 def ballMovement(draw):
-    global GO_TO_LEFT, BALL_X, BALL_Y, END_OF_GAME, WINNER
-    if GO_TO_LEFT:
+    global BALL_X_TRAJ, BALL_Y_TRAJ, BALL_X, BALL_Y, END_OF_GAME, WINNER
+    if BALL_X_TRAJ == -1:
         # the screen is cleared
         draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
 
         # draw the ball
-        BALL_X -= DIFFICULTY
-        draw.point((BALL_X, BALL_Y))
+        BALL_X += BALL_X_TRAJ
+        BALL_Y += BALL_Y_TRAJ
 
-        if BALL_X <= 16:
-            GO_TO_LEFT = False
+        if BALL_X <= 16: # the ball touches player 1 pad
+            ballTrajectory("player1")
+
             if checkPoint(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player2"
+        
+        draw.point((BALL_X, BALL_Y))
             
     else:
         # the screen is cleared
         draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
 
         # draw the ball
-        BALL_X += DIFFICULTY
-        draw.point((BALL_X, BALL_Y))
+        BALL_X += BALL_X_TRAJ
+        BALL_Y += BALL_Y_TRAJ
 
-        if BALL_X >= 110:
-            GO_TO_LEFT = True
+        if BALL_X >= 111:
+            ballTrajectory("player2")
+
             if checkPoint(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player1"
+        
+        draw.point((BALL_X, BALL_Y))
 
 
 
