@@ -151,7 +151,7 @@ def updatePlayer(player, movement, draw):
                 P2_BOTTOM_Y += 5
 
         # the screen is cleared
-        draw.rectangle([(112, 0), (117, 127)], fill="#ffffff")
+        draw.rectangle([(111, 0), (117, 127)], fill="#ffffff")
 
         # the new line is drew
         draw.line([(P2_X,P2_TOP_Y),(P2_X,P2_BOTTOM_Y)])
@@ -173,7 +173,7 @@ def ballMovement(draw):
     global BALL_X_TRAJ, BALL_Y_TRAJ, BALL_X, BALL_Y, END_OF_GAME, WINNER
     if BALL_X_TRAJ == -1:
         # the screen is cleared
-        draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
+        draw.rectangle([(16, 0), (111, 127)], fill="#ffffff")
 
         # draw the ball
         BALL_X += BALL_X_TRAJ
@@ -190,7 +190,7 @@ def ballMovement(draw):
             
     else:
         # the screen is cleared
-        draw.rectangle([(16, 0), (110, 127)], fill="#ffffff")
+        draw.rectangle([(16, 0), (111, 127)], fill="#ffffff")
 
         # draw the ball
         BALL_X += BALL_X_TRAJ
