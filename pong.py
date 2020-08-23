@@ -52,11 +52,12 @@ GPIO.setup(KEY2_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(KEY3_PIN,        GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 ## GAME SETUP
-DIFFICULTY = 5 # this is the number of pixel the ball will move each tick
+DIFFICULTY = 3 # this is the number of pixel the ball will move each tick
 END_OF_GAME = False # set to True when a player loses a point
 WINNER = "none"
 PAD_SPAN = 15 # size of players pads
 MIDDLE_PAD_SPAN = PAD_SPAN/3 # size of the middle of the pad where the ball will go straight
+PLAYERS_MOVEMENT = 4
 
 # player 1
 P1_X = 15
@@ -117,7 +118,7 @@ def computePlayerBounce(currentY, YTop, YBottom):
 # updatePlayer adjust the position of the player line depending of the movement
 def updatePlayer(player, movement, draw):
     if player == "player1":
-        global P1_TOP_Y, P1_BOTTOM_Y
+        global P1_TOP_Y, P1_BOTTOM_Y, PLAYERS_MOVEMENT
 
         if movement == "up":
             # if we are at the top of the screen, we simply ignore the movement instruction
@@ -125,16 +126,16 @@ def updatePlayer(player, movement, draw):
                 pass
 
             else:
-                P1_TOP_Y -= 5
-                P1_BOTTOM_Y -= 5
+                P1_TOP_Y -= PLAYERS_MOVEMENT
+                P1_BOTTOM_Y -= PLAYERS_MOVEMENT
 
         else:
             if P1_BOTTOM_Y >= 64:
                 pass
 
             else:
-                P1_TOP_Y += 5
-                P1_BOTTOM_Y += 5
+                P1_TOP_Y += PLAYERS_MOVEMENT
+                P1_BOTTOM_Y += PLAYERS_MOVEMENT
 
         # the screen is cleared
         draw.rectangle([(0, 0), (15, 127)], fill="#ffffff")
@@ -150,16 +151,16 @@ def updatePlayer(player, movement, draw):
                 pass
 
             else:
-                P2_TOP_Y -= 5
-                P2_BOTTOM_Y -= 5
+                P2_TOP_Y -= PLAYERS_MOVEMENT
+                P2_BOTTOM_Y -= PLAYERS_MOVEMENT
 
         else:
             if P2_BOTTOM_Y >= 64:
                 pass
 
             else:
-                P2_TOP_Y += 5
-                P2_BOTTOM_Y += 5
+                P2_TOP_Y += PLAYERS_MOVEMENT
+                P2_BOTTOM_Y += PLAYERS_MOVEMENT
 
         # the screen is cleared
         draw.rectangle([(111, 0), (117, 127)], fill="#ffffff")
@@ -182,9 +183,9 @@ def ballVector(obstacle):
 
 def ballMovement(draw):
     global BALL_X_TRAJ, BALL_Y_TRAJ, BALL_X, BALL_Y, END_OF_GAME, WINNER
-    if BALL_Y == 0:
+    if BALL_Y <= 0:
         ballVector("topwall")
-    elif BALL_Y == 64:
+    elif BALL_Y >= 64:
         ballVector("bottomwall")
 
     if BALL_X_TRAJ == -1:
@@ -192,8 +193,8 @@ def ballMovement(draw):
         draw.rectangle([(16, 0), (111, 127)], fill="#ffffff")
 
         # draw the ball
-        BALL_X += BALL_X_TRAJ
-        BALL_Y += BALL_Y_TRAJ
+        BALL_X += BALL_X_TRAJ * DIFFICULTY
+        BALL_Y += BALL_Y_TRAJ * DIFFICULTY
 
         if BALL_X <= 16: # the ball touches player 1 pad
             ballVector("player1")
@@ -201,8 +202,9 @@ def ballMovement(draw):
             if checkPoint(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player2"
-
-            computePlayerBounce(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y)
+            else: # no winner
+                computePlayerBounce(BALL_Y, P1_TOP_Y, P1_BOTTOM_Y)
+        
         draw.point((BALL_X, BALL_Y))
             
     else:
@@ -210,8 +212,8 @@ def ballMovement(draw):
         draw.rectangle([(16, 0), (111, 127)], fill="#ffffff")
 
         # draw the ball
-        BALL_X += BALL_X_TRAJ
-        BALL_Y += BALL_Y_TRAJ
+        BALL_X += BALL_X_TRAJ * DIFFICULTY
+        BALL_Y += BALL_Y_TRAJ * DIFFICULTY
 
         if BALL_X >= 111:
             ballVector("player2")
@@ -219,7 +221,9 @@ def ballMovement(draw):
             if checkPoint(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y):
                 END_OF_GAME = True
                 WINNER = "player1"
-            computePlayerBounce(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y)
+            else:
+                computePlayerBounce(BALL_Y, P2_TOP_Y, P2_BOTTOM_Y)
+
         draw.point((BALL_X, BALL_Y))
 
 
